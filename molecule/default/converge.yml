@@ -16,7 +16,7 @@
 
     - name: Include kibana role
       ansible.builtin.include_role:
-        name: kibana
+        name: boutetnico.kibana
       vars:
         kibana_encryption_key: test-encryption-key-min-32-chars-long-12345
         kibana_elasticsearch_hosts:
