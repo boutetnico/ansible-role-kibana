@@ -1,0 +1,60 @@
+---
+- name: Query existing data views
+  ansible.builtin.uri:
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      Content-Type: application/json
+      kbn-xsrf: anything
+    method: GET
+    status_code: 200,404
+    url: "http://localhost:5601/api/data_views"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  register: kibana_existing_data_views
+
+- name: Ensure data views exist
+  ansible.builtin.uri:
+    body:
+      data_view:
+        title: "{{ item.name }}"
+        timeFieldName: "{{ item.time_field | d(kibana_data_view_time_field) }}"
+    body_format: json
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      kbn-xsrf: anything
+    method: POST
+    url: "http://localhost:5601/api/data_views/data_view"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  loop: "{{ kibana_data_views }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name not in kibana_existing_data_views.json.data_view | selectattr('name', 'defined') | map(attribute="name") | list
+
+- name: Define a default data view
+  ansible.builtin.uri:
+    body:
+      data_view_id: >-
+        {{ (kibana_existing_data_views.json.data_view
+        | selectattr('name', 'defined')
+        | selectattr('name', 'equalto', item.name)
+        | list
+        | first).id }}
+      force: true
+    body_format: json
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      kbn-xsrf: anything
+    method: POST
+    url: "http://localhost:5601/api/data_views/default"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  loop: "{{ kibana_data_views }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - item.default is defined and item.default
+    - kibana_existing_data_views.json.data_view | selectattr('name', 'defined') | selectattr('name', 'equalto', item.name) | list | length > 0

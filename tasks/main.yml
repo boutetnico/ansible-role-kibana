@@ -1,0 +1,62 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    name: "{{ kibana_dependencies }}"
+    state: present
+    update_cache: true
+
+- name: Configure Elastic APT repository
+  ansible.builtin.deb822_repository:
+    components: main
+    name: elastic
+    signed_by: "{{ kibana_apt_signed_by }}"
+    suites: stable
+    uris: "{{ kibana_apt_uris }}"
+
+- name: Install Kibana
+  ansible.builtin.apt:
+    name: "{{ kibana_package }}"
+    state: "{{ kibana_package_state }}"
+    update_cache: true
+
+- name: Install Kibana config file
+  ansible.builtin.template:
+    dest: /etc/kibana/kibana.yml
+    group: kibana
+    mode: "0644"
+    owner: root
+    src: kibana.yml.j2
+  notify: Restart kibana
+
+- name: Ensure Kibana is started and starts at boot
+  ansible.builtin.service:
+    enabled: true
+    name: kibana
+    state: started
+
+- name: Wait for Kibana to be ready
+  ansible.builtin.uri:
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      kbn-xsrf: anything
+    method: GET
+    status_code: 200
+    url: http://localhost:5601/api/status
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  register: kibana_status
+  until: >
+    kibana_status.status == 200 and
+    kibana_status.json is defined and
+    kibana_status.json.status is defined and
+    kibana_status.json.status.overall is defined and
+    kibana_status.json.status.overall.level == "available"
+  retries: 30
+  delay: 10
+
+- name: Setup data views
+  ansible.builtin.import_tasks: data_views.yml
+
+- name: Setup saved objects
+  ansible.builtin.import_tasks: saved_objects.yml

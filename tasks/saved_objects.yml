@@ -1,0 +1,19 @@
+---
+- name: Import saved objects
+  ansible.builtin.uri:
+    body_format: form-multipart
+    body:
+      file:
+        content: "{{ lookup('file', item) }}"
+        filename: "{{ item | basename }}"
+        mime_type: "application/x-ndjson"
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      kbn-xsrf: true
+    method: POST
+    url: "http://localhost:5601/api/saved_objects/_import?overwrite=true"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  with_fileglob: "{{ kibana_saved_objects_path }}/*.ndjson"
+  when: kibana_saved_objects_path | length > 0

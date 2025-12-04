@@ -1,0 +1,6 @@
+---
+kibana_apt_signed_by: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+kibana_apt_uris: https://artifacts.elastic.co/packages/9.x/apt
+
+kibana_package: kibana

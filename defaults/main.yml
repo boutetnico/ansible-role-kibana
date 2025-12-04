@@ -1,0 +1,37 @@
+---
+kibana_dependencies:
+  - apt-transport-https
+  - gnupg
+  - python3-debian
+
+kibana_package_state: present
+
+kibana_server_port: 5601
+kibana_server_host: localhost
+kibana_public_base_url: http://localhost:5601
+kibana_server_name: "{{ ansible_hostname }}"
+kibana_elasticsearch_hosts:
+  - http://localhost:9200
+# kibana_elasticsearch_username:
+# kibana_elasticsearch_password:
+kibana_logging_level: warn
+
+kibana_data_views:
+  - name: "filebeat-*"
+    default: true
+# - name: "logs"
+#   time_field: "date"
+kibana_data_view_time_field: "@timestamp"
+
+kibana_saved_objects_path: ""
+
+kibana_encryption_key: ""
+
+kibana_config:
+  telemetry.optIn: false
+  newsfeed.enabled: false
+  xpack.fleet.enabled: false
+  xpack.fleet.agents.enabled: false
+  xpack.reporting.enabled: false
+  xpack.observabilityAIAssistant.enabled: false
+  xpack.screenshotting.browser.chromium.disableSandbox: true
