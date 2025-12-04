@@ -86,8 +86,14 @@ def test_kibana_encryption_keys_configured(host):
     content = config_file.content_string
 
     # Encryption keys
-    assert 'xpack.security.encryptionKey: "test-encryption-key-min-32-chars-long-12345"' in content
-    assert 'xpack.encryptedSavedObjects.encryptionKey: "test-encryption-key-min-32-chars-long-12345"' in content
+    assert (
+        'xpack.security.encryptionKey: "test-encryption-key-min-32-chars-long-12345"'
+        in content
+    )
+    assert (
+        'xpack.encryptedSavedObjects.encryptionKey: "test-encryption-key-min-32-chars-long-12345"'
+        in content
+    )
 
 
 def test_kibana_authentication_not_in_config_without_credentials(host):
@@ -122,9 +128,7 @@ def test_kibana_responds_to_http_requests(host):
 
 def test_kibana_data_view_created(host):
     """Test that data view was created"""
-    cmd = host.run(
-        "curl -s -H 'kbn-xsrf: true' http://localhost:5601/api/data_views"
-    )
+    cmd = host.run("curl -s -H 'kbn-xsrf: true' http://localhost:5601/api/data_views")
     assert cmd.rc == 0
     assert "test-logs-*" in cmd.stdout
 
@@ -141,9 +145,7 @@ def test_kibana_saved_object_imported(host):
 
 def test_kibana_api_status_available(host):
     """Test that Kibana API reports available status"""
-    cmd = host.run(
-        "curl -s -H 'kbn-xsrf: true' http://localhost:5601/api/status"
-    )
+    cmd = host.run("curl -s -H 'kbn-xsrf: true' http://localhost:5601/api/status")
     assert cmd.rc == 0
     assert '"level":"available"' in cmd.stdout
 
