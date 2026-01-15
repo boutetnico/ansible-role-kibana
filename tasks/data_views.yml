@@ -8,7 +8,7 @@
       kbn-xsrf: anything
     method: GET
     status_code: 200,404
-    url: "http://localhost:5601/api/data_views"
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/data_views"
     url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
     url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
   register: kibana_existing_data_views
@@ -25,7 +25,7 @@
     headers:
       kbn-xsrf: anything
     method: POST
-    url: "http://localhost:5601/api/data_views/data_view"
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/data_views/data_view"
     url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
     url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
   loop: "{{ kibana_data_views }}"
@@ -49,7 +49,7 @@
     headers:
       kbn-xsrf: anything
     method: POST
-    url: "http://localhost:5601/api/data_views/default"
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/data_views/default"
     url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
     url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
   loop: "{{ kibana_data_views }}"
