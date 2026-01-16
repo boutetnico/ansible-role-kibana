@@ -15,5 +15,5 @@
     url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/saved_objects/_import?overwrite=true"
     url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
     url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
-  with_fileglob: "{{ kibana_saved_objects_path }}/*.ndjson"
+  loop: "{{ query('fileglob', kibana_saved_objects_path ~ '/*.ndjson') }}"
   when: kibana_saved_objects_path | length > 0
