@@ -27,6 +27,7 @@
     owner: root
     src: kibana.yml.j2
   notify: Restart kibana
+  no_log: true
 
 - name: Ensure Kibana is started and starts at boot
   ansible.builtin.service:

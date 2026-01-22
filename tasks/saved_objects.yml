@@ -17,3 +17,4 @@
     url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
   loop: "{{ query('fileglob', kibana_saved_objects_path ~ '/*.ndjson') }}"
   when: kibana_saved_objects_path | length > 0
+  no_log: true

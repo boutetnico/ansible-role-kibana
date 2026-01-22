@@ -12,6 +12,7 @@
     url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
     url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
   register: kibana_existing_data_views
+  no_log: true
 
 - name: Ensure data views exist
   ansible.builtin.uri:
@@ -32,6 +33,7 @@
   loop_control:
     label: "{{ item.name }}"
   when: item.name not in kibana_existing_data_views.json.data_view | selectattr('name', 'defined') | map(attribute="name") | list
+  no_log: true
 
 - name: Define a default data view
   ansible.builtin.uri:
@@ -58,3 +60,4 @@
   when:
     - item.default is defined and item.default
     - kibana_existing_data_views.json.data_view | selectattr('name', 'defined') | selectattr('name', 'equalto', item.name) | list | length > 0
+  no_log: true
