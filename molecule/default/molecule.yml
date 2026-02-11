@@ -7,8 +7,8 @@ driver:
   name: docker
 
 platforms:
-  - name: ansible-role-kibana-debian-11
-    image: debian:11
+  - name: ansible-role-kibana-debian-12
+    image: debian:12
     command: /lib/systemd/systemd
     tmpfs:
       - /run
@@ -19,8 +19,8 @@ platforms:
     docker_host: "${DOCKER_HOST:-unix://var/run/docker.sock}"
     networks:
       - name: kibana-test-network
-  - name: ansible-role-kibana-debian-12
-    image: debian:12
+  - name: ansible-role-kibana-debian-13
+    image: debian:13
     command: /lib/systemd/systemd
     tmpfs:
       - /run
