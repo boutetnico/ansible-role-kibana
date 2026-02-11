@@ -3,6 +3,34 @@
   hosts: localhost
   gather_facts: false
   tasks:
+    - name: Download Elastic APT package metadata
+      ansible.builtin.get_url:
+        url: https://artifacts.elastic.co/packages/9.x/apt/dists/stable/main/binary-amd64/Packages.gz
+        dest: /tmp/elastic-packages.gz
+        mode: "0644"
+
+    - name: Determine latest Elasticsearch 9.x version from APT repository
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          gunzip -c /tmp/elastic-packages.gz |
+          awk '/^Package: kibana$/{found=1} found && /^Version:/{print $2; found=0}' |
+          sort -V |
+          tail -1
+        executable: /bin/bash
+      register: es_version
+      changed_when: false
+      failed_when: es_version.stdout == ''
+
+    - name: Remove temporary package metadata
+      ansible.builtin.file:
+        path: /tmp/elastic-packages.gz
+        state: absent
+
+    - name: Display Elasticsearch version to use
+      ansible.builtin.debug:
+        msg: "Using Elasticsearch version: {{ es_version.stdout }}"
+
     - name: Create Docker network for test
       community.docker.docker_network:
         name: kibana-test-network
@@ -11,7 +39,7 @@
     - name: Create Elasticsearch container
       community.docker.docker_container:
         name: elasticsearch-test
-        image: docker.elastic.co/elasticsearch/elasticsearch:9.2.1
+        image: "docker.elastic.co/elasticsearch/elasticsearch:{{ es_version.stdout }}"
         state: started
         env:
           discovery.type: single-node
