@@ -41,4 +41,3 @@
   when:
     - kibana_connectors | length > 0
     - item.id not in kibana_existing_connectors.json | map(attribute='id') | list
-  no_log: true
