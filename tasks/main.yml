@@ -61,3 +61,9 @@
 
 - name: Setup saved objects
   ansible.builtin.import_tasks: saved_objects.yml
+
+- name: Setup connectors
+  ansible.builtin.import_tasks: connectors.yml
+
+- name: Setup alerting rules
+  ansible.builtin.import_tasks: alerting_rules.yml

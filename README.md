@@ -37,6 +37,8 @@ Role Variables
 | kibana_data_views              | true     |                             | list      | Data views to create. See `defaults/main.yml`.    |
 | kibana_data_view_time_field    | true     | `@timestamp`                | string    | Default time field for data views.                |
 | kibana_saved_objects_path      | true     | `""`                        | string    | Path to `.ndjson` files to import.                |
+| kibana_connectors              | true     | `[]`                        | list      | Connectors to create. See `defaults/main.yml`.    |
+| kibana_alerting_rules          | true     | `[]`                        | list      | Alerting rules to create. See `defaults/main.yml`.|
 | kibana_encryption_key          | true     | `""`                        | string    | Encryption key for saved objects and security.    |
 | kibana_config                  | true     |                             | dict      | Additional Kibana config. See `defaults/main.yml`.|
 
@@ -57,6 +59,35 @@ Example Playbook
               default: true
             - name: "logs-*"
               time_field: "@timestamp"
+          kibana_connectors:
+            - id: monitoring-slack
+              name: "Monitoring Slack"
+              connector_type_id: ".slack"
+              secrets:
+                webhookUrl: "https://hooks.slack.com/services/T.../B.../xxx"
+          kibana_alerting_rules:
+            - id: log-errors
+              name: "Log errors"
+              rule_type_id: ".es-query"
+              schedule:
+                interval: "5m"
+              params:
+                searchType: kql
+                index: ["filebeat-*"]
+                timeField: "@timestamp"
+                timeWindowSize: 5
+                timeWindowUnit: m
+                threshold: [0]
+                thresholdComparator: gt
+                aggType: count
+                size: 10
+                excludeHitsFromPreviousRun: true
+                query: "message: (error OR fail OR critical)"
+              actions:
+                - id: monitoring-slack
+                  group: query matched
+                  params:
+                    message: "{{context.title}}: {{context.message}}"
 
 Testing
 -------

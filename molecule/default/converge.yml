@@ -25,3 +25,35 @@
           - name: "test-logs-*"
             default: true
         kibana_saved_objects_path: "{{ playbook_dir }}/files"
+        kibana_connectors:
+          - id: test-server-log-connector
+            name: "Test Server Log"
+            connector_type_id: ".server-log"
+            secrets: {}
+        kibana_alerting_rules:
+          - id: test-es-query-rule
+            name: "Test ES Query Rule"
+            rule_type_id: ".es-query"
+            consumer: alerts
+            enabled: false
+            schedule:
+              interval: "1m"
+            params:
+              searchType: kql
+              index:
+                - "filebeat-*"
+              timeField: "@timestamp"
+              timeWindowSize: 5
+              timeWindowUnit: m
+              threshold:
+                - 0
+              thresholdComparator: gt
+              aggType: count
+              size: 10
+              excludeHitsFromPreviousRun: true
+              query: "message: error"
+            actions:
+              - id: test-server-log-connector
+                group: query matched
+                params:
+                  message: "Test alert triggered"

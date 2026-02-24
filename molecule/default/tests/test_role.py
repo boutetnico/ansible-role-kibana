@@ -159,3 +159,31 @@ def test_kibana_default_data_view_set(host):
     # Should return a data view ID, not null
     assert "data_view_id" in cmd.stdout
     assert "null" not in cmd.stdout
+
+
+def test_kibana_connector_created(host):
+    """Test that connector was created"""
+    cmd = host.run(
+        "curl -s -H 'kbn-xsrf: true' http://localhost:5601/api/actions/connectors"
+    )
+    assert cmd.rc == 0
+    assert "Test Server Log" in cmd.stdout
+
+
+def test_kibana_alerting_rule_created(host):
+    """Test that alerting rule was created"""
+    cmd = host.run(
+        "curl -s -H 'kbn-xsrf: true' " "http://localhost:5601/api/alerting/rules/_find"
+    )
+    assert cmd.rc == 0
+    assert "Test ES Query Rule" in cmd.stdout
+
+
+def test_kibana_alerting_rule_is_disabled(host):
+    """Test that the test alerting rule is disabled"""
+    cmd = host.run(
+        "curl -s -H 'kbn-xsrf: true' "
+        "http://localhost:5601/api/alerting/rule/test-es-query-rule"
+    )
+    assert cmd.rc == 0
+    assert '"enabled":false' in cmd.stdout
