@@ -26,7 +26,7 @@
             default: true
         kibana_saved_objects_path: "{{ playbook_dir }}/files"
         kibana_connectors:
-          - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+          - id: 777ad098-7b7e-4f59-95b0-d440c4684c4d
             name: "Test Server Log"
             connector_type_id: ".server-log"
         kibana_alerting_rules:
@@ -52,7 +52,7 @@
               excludeHitsFromPreviousRun: true
               esQuery: '{"query":{"match_all":{}}}'
             actions:
-              - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+              - id: 777ad098-7b7e-4f59-95b0-d440c4684c4d
                 group: query matched
                 params:
                   message: "Test alert triggered"
