@@ -54,5 +54,8 @@
             actions:
               - id: 777ad098-7b7e-4f59-95b0-d440c4684c4d
                 group: query matched
+                frequency:
+                  summary: false
+                  notify_when: onActionGroupChange
                 params:
                   message: "Test alert triggered"

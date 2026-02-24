@@ -13,7 +13,7 @@
     url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
   register: kibana_existing_rules
   when: kibana_alerting_rules | length > 0
-  # no_log: true
+  no_log: true
 
 - name: Create alerting rules
   ansible.builtin.uri:
@@ -44,7 +44,7 @@
   when:
     - kibana_alerting_rules | length > 0
     - item.id not in kibana_existing_rules.json.data | map(attribute='id') | list
-  # no_log: true
+  no_log: true
 
 - name: Update existing alerting rules
   ansible.builtin.uri:
@@ -70,4 +70,4 @@
   when:
     - kibana_alerting_rules | length > 0
     - item.id in kibana_existing_rules.json.data | map(attribute='id') | list
-  # no_log: true
+  no_log: true

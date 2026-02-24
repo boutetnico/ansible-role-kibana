@@ -86,6 +86,9 @@ Example Playbook
               actions:
                 - id: 550e8400-e29b-41d4-a716-446655440000
                   group: query matched
+                  frequency:
+                    summary: false
+                    notify_when: onActionGroupChange
                   params:
                     message: "{{context.title}}: {{context.message}}"
 
