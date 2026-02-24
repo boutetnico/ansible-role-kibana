@@ -24,6 +24,41 @@ kibana_data_view_time_field: "@timestamp"
 
 kibana_saved_objects_path: ""
 
+kibana_connectors: []
+# - id: 550e8400-e29b-41d4-a716-446655440000  # Must be a UUID
+#   name: "Monitoring Slack"
+#   connector_type_id: ".slack"
+#   secrets:
+#     webhookUrl: "https://hooks.slack.com/services/T.../B.../xxx"
+
+kibana_alerting_rules: []
+# - id: log-errors-syslog
+#   name: "Log errors - syslog"
+#   rule_type_id: ".es-query"
+#   consumer: alerts
+#   schedule:
+#     interval: "5m"
+#   params:
+#     searchType: esQuery
+#     index: ["filebeat-*"]
+#     timeField: "@timestamp"
+#     timeWindowSize: 5
+#     timeWindowUnit: m
+#     threshold: [0]
+#     thresholdComparator: ">"
+#     aggType: count
+#     size: 10
+#     excludeHitsFromPreviousRun: true
+#     esQuery: '{"query":{"query_string":{"query":"message: (error OR fail)"}}}'
+#   actions:
+#     - id: 550e8400-e29b-41d4-a716-446655440000
+#       group: query matched
+#       frequency:
+#         summary: false
+#         notify_when: onActionGroupChange
+#       params:
+#         message: "{{context.title}}: {{context.message}}"
+
 kibana_encryption_key: ""
 
 kibana_config:

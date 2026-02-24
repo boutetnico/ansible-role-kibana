@@ -1,0 +1,73 @@
+---
+- name: Query existing alerting rules
+  ansible.builtin.uri:
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      Content-Type: application/json
+      kbn-xsrf: anything
+    method: GET
+    status_code: 200
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/alerting/rules/_find?per_page=100"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  register: kibana_existing_rules
+  when: kibana_alerting_rules | length > 0
+  no_log: true
+
+- name: Create alerting rules
+  ansible.builtin.uri:
+    body:
+      actions: "{{ item.actions | d([]) }}"
+      consumer: "{{ item.consumer | d('alerts') }}"
+      enabled: "{{ item.enabled | d(true) }}"
+      name: "{{ item.name }}"
+      params: "{{ item.params }}"
+      rule_type_id: "{{ item.rule_type_id }}"
+      schedule: "{{ item.schedule }}"
+      tags: "{{ item.tags | d([]) }}"
+    body_format: json
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      kbn-xsrf: anything
+    method: POST
+    status_code:
+      - 200
+      - 201
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/alerting/rule/{{ item.id }}"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  loop: "{{ kibana_alerting_rules }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - kibana_alerting_rules | length > 0
+    - item.id not in kibana_existing_rules.json.data | map(attribute='id') | list
+  no_log: true
+
+- name: Update existing alerting rules
+  ansible.builtin.uri:
+    body:
+      actions: "{{ item.actions | d([]) }}"
+      name: "{{ item.name }}"
+      params: "{{ item.params }}"
+      schedule: "{{ item.schedule }}"
+      tags: "{{ item.tags | d([]) }}"
+    body_format: json
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      kbn-xsrf: anything
+    method: PUT
+    status_code: 200
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/alerting/rule/{{ item.id }}"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  loop: "{{ kibana_alerting_rules }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - kibana_alerting_rules | length > 0
+    - item.id in kibana_existing_rules.json.data | map(attribute='id') | list
+  no_log: true

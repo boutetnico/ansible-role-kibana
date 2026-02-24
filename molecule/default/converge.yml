@@ -25,3 +25,37 @@
           - name: "test-logs-*"
             default: true
         kibana_saved_objects_path: "{{ playbook_dir }}/files"
+        kibana_connectors:
+          - id: 777ad098-7b7e-4f59-95b0-d440c4684c4d
+            name: "Test Server Log"
+            connector_type_id: ".server-log"
+        kibana_alerting_rules:
+          - id: test-es-query-rule
+            name: "Test ES Query Rule"
+            rule_type_id: ".es-query"
+            consumer: alerts
+            enabled: false
+            schedule:
+              interval: "1m"
+            params:
+              searchType: esQuery
+              index:
+                - "filebeat-*"
+              timeField: "@timestamp"
+              timeWindowSize: 5
+              timeWindowUnit: m
+              threshold:
+                - 0
+              thresholdComparator: ">"
+              aggType: count
+              size: 10
+              excludeHitsFromPreviousRun: true
+              esQuery: '{"query":{"match_all":{}}}'
+            actions:
+              - id: 777ad098-7b7e-4f59-95b0-d440c4684c4d
+                group: query matched
+                frequency:
+                  summary: false
+                  notify_when: onActionGroupChange
+                params:
+                  message: "Test alert triggered"

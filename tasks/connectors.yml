@@ -1,0 +1,44 @@
+---
+- name: Query existing connectors
+  ansible.builtin.uri:
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      Content-Type: application/json
+      kbn-xsrf: anything
+    method: GET
+    status_code: 200
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/actions/connectors"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  register: kibana_existing_connectors
+  when: kibana_connectors | length > 0
+  no_log: true
+
+- name: Create connectors
+  ansible.builtin.uri:
+    body: >-
+      {{
+        {'name': item.name, 'connector_type_id': item.connector_type_id}
+        | combine({'config': item.config} if item.config is defined else {})
+        | combine({'secrets': item.secrets} if item.secrets is defined else {})
+      }}
+    body_format: json
+    follow_redirects: none
+    force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
+    headers:
+      kbn-xsrf: anything
+    method: POST
+    status_code:
+      - 200
+      - 201
+    url: "http://{{ kibana_server_host }}:{{ kibana_server_port }}/api/actions/connector/{{ item.id }}"
+    url_password: "{{ kibana_elasticsearch_password | d(omit) }}"
+    url_username: "{{ kibana_elasticsearch_username | d(omit) }}"
+  loop: "{{ kibana_connectors }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - kibana_connectors | length > 0
+    - item.id not in kibana_existing_connectors.json | map(attribute='id') | list
+  no_log: true
