@@ -60,7 +60,7 @@ Example Playbook
             - name: "logs-*"
               time_field: "@timestamp"
           kibana_connectors:
-            - id: monitoring-slack
+            - id: 550e8400-e29b-41d4-a716-446655440000
               name: "Monitoring Slack"
               connector_type_id: ".slack"
               secrets:
@@ -72,19 +72,19 @@ Example Playbook
               schedule:
                 interval: "5m"
               params:
-                searchType: kql
+                searchType: esQuery
                 index: ["filebeat-*"]
                 timeField: "@timestamp"
                 timeWindowSize: 5
                 timeWindowUnit: m
                 threshold: [0]
-                thresholdComparator: gt
+                thresholdComparator: ">"
                 aggType: count
                 size: 10
                 excludeHitsFromPreviousRun: true
-                query: "message: (error OR fail OR critical)"
+                esQuery: '{"query":{"query_string":{"query":"message: (error OR fail OR critical)"}}}'
               actions:
-                - id: monitoring-slack
+                - id: 550e8400-e29b-41d4-a716-446655440000
                   group: query matched
                   params:
                     message: "{{context.title}}: {{context.message}}"

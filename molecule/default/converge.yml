@@ -26,10 +26,9 @@
             default: true
         kibana_saved_objects_path: "{{ playbook_dir }}/files"
         kibana_connectors:
-          - id: test-server-log-connector
+          - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
             name: "Test Server Log"
             connector_type_id: ".server-log"
-            secrets: {}
         kibana_alerting_rules:
           - id: test-es-query-rule
             name: "Test ES Query Rule"
@@ -39,7 +38,7 @@
             schedule:
               interval: "1m"
             params:
-              searchType: kql
+              searchType: esQuery
               index:
                 - "filebeat-*"
               timeField: "@timestamp"
@@ -47,13 +46,13 @@
               timeWindowUnit: m
               threshold:
                 - 0
-              thresholdComparator: gt
+              thresholdComparator: ">"
               aggType: count
               size: 10
               excludeHitsFromPreviousRun: true
-              query: "message: error"
+              esQuery: '{"query":{"match_all":{}}}'
             actions:
-              - id: test-server-log-connector
+              - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                 group: query matched
                 params:
                   message: "Test alert triggered"

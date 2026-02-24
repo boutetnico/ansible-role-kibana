@@ -17,11 +17,12 @@
 
 - name: Create connectors
   ansible.builtin.uri:
-    body:
-      config: "{{ item.config | d({}) }}"
-      connector_type_id: "{{ item.connector_type_id }}"
-      name: "{{ item.name }}"
-      secrets: "{{ item.secrets | d({}) }}"
+    body: >-
+      {{
+        {'name': item.name, 'connector_type_id': item.connector_type_id}
+        | combine({'config': item.config} if item.config is defined else {})
+        | combine({'secrets': item.secrets} if item.secrets is defined else {})
+      }}
     body_format: json
     follow_redirects: none
     force_basic_auth: "{{ kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined }}"
