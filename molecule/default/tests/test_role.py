@@ -73,7 +73,6 @@ def test_kibana_xpack_configuration(host):
     # X-Pack features disabled
     assert "telemetry.optIn: false" in content
     assert "newsfeed.enabled: false" in content
-    assert "xpack.fleet.enabled: false" in content
     assert "xpack.fleet.agents.enabled: false" in content
     assert "xpack.reporting.enabled: false" in content
     assert "xpack.observabilityAIAssistant.enabled: false" in content

@@ -64,7 +64,6 @@ kibana_encryption_key: ""
 kibana_config:
   telemetry.optIn: false
   newsfeed.enabled: false
-  xpack.fleet.enabled: false
   xpack.fleet.agents.enabled: false
   xpack.reporting.enabled: false
   xpack.observabilityAIAssistant.enabled: false
