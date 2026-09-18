@@ -65,18 +65,14 @@ def test_kibana_logging_configuration(host):
     assert "logging.root.level: warn" in content
 
 
-def test_kibana_xpack_configuration(host):
-    """Test Kibana X-Pack feature configuration"""
+def test_kibana_extra_configuration(host):
+    """Test Kibana extra configuration"""
     config_file = host.file("/etc/kibana/kibana.yml")
     content = config_file.content_string
 
-    # X-Pack features disabled
+    # Defaults rendered from kibana_config
     assert "telemetry.optIn: false" in content
     assert "newsfeed.enabled: false" in content
-    assert "xpack.fleet.agents.enabled: false" in content
-    assert "xpack.reporting.enabled: false" in content
-    assert "xpack.observabilityAIAssistant.enabled: false" in content
-    assert "xpack.screenshotting.browser.chromium.disableSandbox: true" in content
 
 
 def test_kibana_encryption_keys_configured(host):

@@ -40,7 +40,7 @@ Role Variables
 | kibana_connectors              | true     | `[]`                        | list      | Connectors to create. See `defaults/main.yml`.    |
 | kibana_alerting_rules          | true     | `[]`                        | list      | Alerting rules to create. See `defaults/main.yml`.|
 | kibana_encryption_key          | true     | `""`                        | string    | Encryption key for saved objects and security.    |
-| kibana_config                  | true     |                             | dict      | Additional Kibana config. See `defaults/main.yml`.|
+| kibana_config                  | true     | telemetry + newsfeed off    | dict      | Extra config; replaces the default dict.          |
 
 Dependencies
 ------------
